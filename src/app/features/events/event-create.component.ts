@@ -620,11 +620,9 @@ export class EventCreateComponent implements OnInit {
 
     const formValues = this.eventForm.value;
 
-    const startIso = new Date(formValues.startDateTime).toISOString();
-    const endIso = new Date(formValues.endDateTime).toISOString();
-    const deadlineIso = formValues.registrationDeadline
-      ? new Date(formValues.registrationDeadline).toISOString()
-      : null;
+    const startIso = this.formatDateForApi(formValues.startDateTime)!;
+    const endIso = this.formatDateForApi(formValues.endDateTime)!;
+    const deadlineIso = this.formatDateForApi(formValues.registrationDeadline);
 
     if (this.isEditMode()) {
       const updateDto: UpdateEventDto = {
@@ -683,8 +681,22 @@ export class EventCreateComponent implements OnInit {
     }
   }
 
+  private formatDateForApi(value?: string | null): string | null {
+    if (!value) return null;
+    const trimmed = String(value).trim();
+    if (!trimmed) return null;
+    // Keep local datetime without timezone conversion so event times remain wall-clock local
+    if (trimmed.length === 16 && trimmed.includes('T')) {
+      return `${trimmed}:00`;
+    }
+    return trimmed;
+  }
+
   private toDatetimeLocal(isoString?: string | null): string {
     if (!isoString) return '';
+    if (isoString.includes('T') && !isoString.endsWith('Z') && !isoString.includes('+')) {
+      return isoString.substring(0, 16);
+    }
     const d = new Date(isoString);
     if (isNaN(d.getTime())) return '';
     const pad = (n: number) => n.toString().padStart(2, '0');

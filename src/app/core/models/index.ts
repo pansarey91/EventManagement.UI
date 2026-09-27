@@ -11,3 +11,4 @@ export * from './notification.model';
 export * from './category.model';
 export * from './venue.model';
 export * from './dashboard.model';
+export * from './role.model';

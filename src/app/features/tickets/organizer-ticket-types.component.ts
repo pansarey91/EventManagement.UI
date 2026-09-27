@@ -1143,8 +1143,8 @@ export class OrganizerTicketTypesComponent implements OnInit {
     this.formServerError.set(null);
 
     const formValues = this.ticketForm.value;
-    const startIso = formValues.saleStartDate ? new Date(formValues.saleStartDate).toISOString() : null;
-    const endIso = formValues.saleEndDate ? new Date(formValues.saleEndDate).toISOString() : null;
+    const startIso = this.formatDateForApi(formValues.saleStartDate);
+    const endIso = this.formatDateForApi(formValues.saleEndDate);
 
     if (this.editingTicketId()) {
       const updateDto: UpdateTicketTypeDto = {
@@ -1360,8 +1360,21 @@ export class OrganizerTicketTypesComponent implements OnInit {
     }
   }
 
+  private formatDateForApi(value?: string | null): string | null {
+    if (!value) return null;
+    const trimmed = String(value).trim();
+    if (!trimmed) return null;
+    if (trimmed.length === 16 && trimmed.includes('T')) {
+      return `${trimmed}:00`;
+    }
+    return trimmed;
+  }
+
   private toDatetimeLocal(isoString?: string | null): string {
     if (!isoString) return '';
+    if (isoString.includes('T') && !isoString.endsWith('Z') && !isoString.includes('+')) {
+      return isoString.substring(0, 16);
+    }
     const d = new Date(isoString);
     if (isNaN(d.getTime())) return '';
     const pad = (n: number) => n.toString().padStart(2, '0');

@@ -56,11 +56,7 @@ export interface ChangePasswordDto {
   confirmNewPassword: string;
 }
 
-export interface RoleDto {
-  id: string;
-  name: string;
-  description?: string | null;
-}
+export type { RoleDto } from './role.model';
 
 export interface UserQueryDto extends PagedRequest {
   isActive?: boolean;
